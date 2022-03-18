@@ -1,0 +1,22 @@
+description: >
+  Install a specific version of Keeper Secrets Manager CLI.
+usage:
+  version: 2.1
+
+  orbs:
+    keeper: jgiovaresco/keeper@x.y.z
+
+  jobs:
+    deploy:
+      docker:
+        - image: cimg/base:stable
+      steps:
+        - checkout
+        - keeper/install:
+            version: 1.0.7
+        - run: ksm version
+
+  workflows:
+    deploy:
+      jobs:
+        - deploy
