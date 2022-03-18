@@ -4,6 +4,33 @@ orbs:
   orb-tools: circleci/orb-tools@11.1
   shellcheck: circleci/shellcheck@3.1
 
+jobs:
+  commitlint:
+    description: "This job uses CommitLint CLI to validate commits messages, starting from the latest tag."
+    docker:
+      - image: cimg/node:lts
+    resource_class: small
+    steps:
+      - checkout
+      - run:
+          name: "Install and setup CommitLint CLI"
+          command: |
+            npm install --quiet --no-progress @commitlint/cli@16 @commitlint/config-conventional@16
+            echo 'module.exports = {
+                    extends: ["@commitlint/config-conventional"],
+                    rules: {
+                      "body-max-line-length": [1, "always", 100],
+                      "subject-case": [1, "always", "lower-case"],
+                      "subject-empty": [1, "never"],
+                      "type-empty": [1, "never"],
+                    },
+                };
+            ' > .commitlintrc.js
+      - run:
+          name: "Validate commits messages, starting from the latest tag."
+          command: |
+            npx commitlint --from $(git describe --tags --abbrev=0) --to HEAD --verbose
+
 filters: &filters
   tags:
     only: /.*/
@@ -11,6 +38,7 @@ filters: &filters
 workflows:
   lint-pack:
     jobs:
+      - commitlint
       - orb-tools/lint:
           filters: *filters
       - orb-tools/pack:
@@ -24,7 +52,11 @@ workflows:
           orb-name: gravitee-io/keeper
           vcs-type: << pipeline.project.type >>
           requires:
-            [orb-tools/lint, orb-tools/review, orb-tools/pack, shellcheck/check]
+            - commitlint
+            - orb-tools/lint
+            - orb-tools/review
+            - orb-tools/pack
+            - shellcheck/check
           # Use a context to hold your publishing token.
           context: keeper-orb-publishing
           filters: *filters
