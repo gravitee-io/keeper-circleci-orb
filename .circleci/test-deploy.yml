@@ -1,0 +1,50 @@
+version: 2.1
+orbs:
+  keeper: gravitee-io/keeper@dev:<<pipeline.git.revision>>
+  orb-tools: circleci/orb-tools@11.1
+filters: &filters
+  tags:
+    only: /.*/
+
+jobs:
+  integration-test-install-latest:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - keeper/install
+      - run: ksm version
+
+  integration-test-install-version:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - keeper/install:
+          version: 1.0.7
+      - run: ksm version
+
+workflows:
+  test-deploy:
+    jobs:
+      # Make sure to include "filters: *filters" in every test job you want to run as part of your deployment.
+      - integration-test-install-latest:
+          filters: *filters
+      - integration-test-install-version:
+          filters: *filters
+      - orb-tools/pack:
+          filters: *filters
+      - orb-tools/publish:
+          orb-name: gravitee-io/keeper
+          vcs-type: << pipeline.project.type >>
+          pub-type: production
+          requires:
+            - orb-tools/pack
+            - integration-test-install-latest
+            - integration-test-install-version
+          context: keeper-orb-publishing
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /^v[0-9]+\.[0-9]+\.[0-9]+$/
