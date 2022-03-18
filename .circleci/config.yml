@@ -1,11 +1,8 @@
 version: 2.1
 
 orbs:
-  # Replace this with your own!
   keeper: gravitee-io/keeper@<<pipeline.parameters.dev-orb-version>>
   orb-tools: circleci/orb-tools@10.0
-  bats: circleci/bats@1.0
-  shellcheck: circleci/shellcheck@2.0
 
 # Pipeline Parameters
 ## These parameters are used internally by orb-tools. Skip to the Jobs section.
@@ -23,31 +20,18 @@ parameters:
     default: "dev:alpha"
 
 jobs:
-  # Define one or more jobs which will utilize your orb's commands and parameters to validate your changes.
   integration-test-1:
     docker:
       - image: cimg/base:stable
     steps:
       - checkout
-      # "greet" is a sample command packaged with this orb config.
-      # This sample integration test will run as long as the greet command exists. Once you remove the greet command you should remove this line.
-      # Push new changes first, before adding new tests to your config.
-      - keeper/greet
 
 workflows:
-  # Prior to producing a development orb (which requires credentials) basic validation, linting, and even unit testing can be performed.
-  # This workflow will run on every commit
   test-pack:
     unless: << pipeline.parameters.run-integration-tests >>
     jobs:
-      - orb-tools/lint # Lint Yaml files
-      - orb-tools/pack # Pack orb source
-      - shellcheck/check:
-          dir: ./src/scripts
-          exclude: SC2148
-      # optional: Run BATS tests against your scripts
-      - bats/run:
-          path: ./src/tests
+      - orb-tools/lint
+      - orb-tools/pack
       # Publish development version(s) of the orb.
       - orb-tools/publish-dev:
           orb-name: gravitee-io/keeper
@@ -55,8 +39,6 @@ workflows:
           requires:
             - orb-tools/lint
             - orb-tools/pack
-            - bats/run
-            - shellcheck/check
       # Trigger an integration workflow to test the
       # dev:${CIRCLE_SHA1:0:7} version of your orb
       - orb-tools/trigger-integration-tests-workflow:
