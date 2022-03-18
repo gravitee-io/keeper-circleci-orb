@@ -1,0 +1,24 @@
+description: >
+  Install the Keeper Secrets Manager CLI
+
+parameters:
+  version:
+    type: string
+    default: "latest"
+    description: "Version of the KSM CLI"
+  path:
+    type: string
+    default: /usr/local/bin
+    description: "Path to install KSM CLI to"
+  shell:
+    type: string
+    default: /bin/sh
+    description: "The shell used to run the install script"
+
+steps:
+  - run:
+      name: "Ensure KSM CLI is installed"
+      shell: << parameters.shell >>
+      environment:
+        KSM_CLI_VERSION: << parameters.version >>
+      command: <<include(scripts/install.sh)>>
