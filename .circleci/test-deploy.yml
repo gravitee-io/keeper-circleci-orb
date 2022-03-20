@@ -11,18 +11,35 @@ jobs:
     docker:
       - image: cimg/base:stable
     steps:
-      - checkout
       - keeper/install
-      - run: ksm version
+      - run:
+          name: "Assert keeper installation"
+          command: |
+            if [[ -f keeper.ini ]]; then
+              echo "❌ keeper.ini file created in the current directory."
+              exit 1
+            fi      
+            if [[ ! -f /tmp/keeper.ini ]]; then
+              echo "❌ no keeper.ini file created in the /tmp directory."
+              exit 1
+            fi
 
   integration-test-install-version:
     docker:
       - image: cimg/base:stable
     steps:
-      - checkout
       - keeper/install:
           version: 1.0.7
-      - run: ksm version
+      - run:
+          command: |
+            if [[ -f keeper.ini ]]; then
+              echo "❌ keeper.ini file created in the current directory."
+              exit 1
+            fi      
+            if [[ ! -f /tmp/keeper.ini ]]; then
+              echo "❌ no keeper.ini file created in the /tmp directory."
+              exit 1
+            fi
 
 workflows:
   test-deploy:
