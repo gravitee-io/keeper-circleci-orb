@@ -12,8 +12,12 @@ parameters:
     description: "Path to install KSM CLI to"
   shell:
     type: string
-    default: /bin/sh
+    default: /bin/bash
     description: "The shell used to run the install script"
+  ini_dir:
+    type: string
+    default: /tmp/keeper
+    description: "The directory where the keeper.ini will be saved"
 
 steps:
   - run:
@@ -21,4 +25,10 @@ steps:
       shell: << parameters.shell >>
       environment:
         KSM_CLI_VERSION: << parameters.version >>
-      command: <<include(scripts/install.sh)>>
+      command: <<include(scripts/install/install_ksm.sh)>>
+  - run:
+      name: "Initialize Keeper config"
+      shell: << parameters.shell >>
+      environment:
+        KEEPER_INI_DIR: << parameters.ini_dir >>
+      command: <<include(scripts/install/init_config.sh)>>
