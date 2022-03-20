@@ -1,0 +1,22 @@
+description: >
+  Load a secret and make it available as an environment variable for next steps in the job.
+
+parameters:
+  var-name:
+    type: string
+    description: Name of the environment variable to populate with the secret
+  secret-url:
+    type: string
+    description: >
+      Secret notation "url". Ex: keeper://RECORD_UID/field/password
+      See: https://docs.keeper.io/secrets-manager/secrets-manager/secrets-manager-command-line-interface/secret-command#notation
+
+steps:
+  - install
+  - run:
+      name: Load secret in << parameters.var-name >>
+      environment:
+        SECRET_ENV_NAME: << parameters.var-name >>
+        SECRET_URL: << parameters.secret-url >>
+
+      command: <<include(scripts/env-export/env-export.sh)>>

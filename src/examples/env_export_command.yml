@@ -1,0 +1,23 @@
+description: >
+  Use the keeper/env-export command to load a secret and make it available as an environment variable for next steps in the job.
+  This is useful for providing an orb job with secrets as pre-step to the job.
+
+usage:
+  version: 2.1
+
+  orbs:
+    secrethub: gravitee-io/keeper@x.y.z
+    docker: circleci/docker@x.y.z
+
+  workflows:
+    publish:
+      jobs:
+        - docker/publish:
+            image: company/app
+            pre-steps:
+              - keeper/env-export:
+                  var-name: DOCKER_LOGIN
+                  secret-url: keeper://RECORD_UID/field/login
+              - keeper/env-export:
+                  var-name: DOCKER_PASSWORD
+                  secret-url: keeper://RECORD_UID/field/password
