@@ -29,7 +29,8 @@ filters: &filters
 workflows:
   lint-pack:
     jobs:
-      - commitlint
+      - commitlint:
+          filters: *filters
       - orb-tools/lint:
           filters: *filters
       - orb-tools/pack:
@@ -41,6 +42,7 @@ workflows:
           filters: *filters
       - bats/run:
           path: ./src/scripts/**
+          filters: *filters
       - orb-tools/publish:
           orb-name: gravitee-io/keeper
           vcs-type: << pipeline.project.type >>
