@@ -42,6 +42,23 @@ jobs:
               exit 1
             fi
 
+  integration-test-install-on-alpine:
+    docker:
+      - image: alpine:3.15
+    steps:
+      - keeper/install
+      - run:
+          name: "Assert keeper installation"
+          command: |
+            if [[ -f keeper.ini ]]; then
+              echo "❌ keeper.ini file created in the current directory."
+              exit 1
+            fi      
+            if [[ ! -f /tmp/keeper.ini ]]; then
+              echo "❌ no keeper.ini file created in the /tmp directory."
+              exit 1
+            fi
+
   integration-test-env-export:
     docker:
       - image: cimg/base:stable
@@ -68,6 +85,34 @@ jobs:
               exit 1;
             fi
 
+  integration-test-env-export-on-alpine:
+    docker:
+      - image: alpine:3.15
+    steps:
+      - keeper/env-export:
+          secret-url: keeper://zB_JnULMlYaeCEQPE8p3HA/field/login
+          var-name: MY_USER
+      - keeper/env-export:
+          secret-url: keeper://zB_JnULMlYaeCEQPE8p3HA/field/password
+          var-name: MY_PASSWORD
+      - run:
+          name: "Assert environment variables set"
+          command: |
+            . $BASH_ENV
+            
+            if [[ "$MY_USER" != "test" ]]; then
+              echo "❌ MY_USER env invalid"
+              echo "Expected MY_USER=test, but was MY_USER=${MY_USER}"
+              echo "Content of export command: $(cat $BASH_ENV)"
+              exit 1;
+            fi              
+            if [[ "$MY_PASSWORD" != "keeper2022" ]]; then
+              echo "❌ MY_PASSWORD env invalid"
+              echo "Expected MY_PASSWORD=keeper2022, but was MY_PASSWORD=${MY_USER}"
+              echo "Content of export command: $(cat $BASH_ENV)"
+              exit 1;
+            fi
+
 workflows:
   test-deploy:
     jobs:
@@ -76,7 +121,11 @@ workflows:
           filters: *filters
       - integration-test-install-version:
           filters: *filters
+      - integration-test-install-on-alpine:
+          filters: *filters
       - integration-test-env-export:
+          filters: *filters
+      - integration-test-env-export-on-alpine:
           filters: *filters
       - orb-tools/pack:
           filters: *filters
@@ -88,7 +137,9 @@ workflows:
             - orb-tools/pack
             - integration-test-install-latest
             - integration-test-install-version
+            - integration-test-install-on-alpine
             - integration-test-env-export
+            - integration-test-env-export-on-alpine
           context: keeper-orb-publishing
           filters:
             branches:

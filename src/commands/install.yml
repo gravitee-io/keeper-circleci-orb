@@ -12,7 +12,7 @@ parameters:
     description: "Path to install KSM CLI to"
   shell:
     type: string
-    default: /bin/bash
+    default: /bin/sh
     description: "The shell used to run the install script"
   ini_dir:
     type: string
