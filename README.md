@@ -8,14 +8,19 @@
 
 ## Usage
 
-Currently, the orb contains only one command to install [Keeper Secrets Manager CLI](https://docs.keeper.io/secrets-manager/secrets-manager/secrets-manager-command-line-interface)
+Currently, the orb contains the following commands:
+- `install`: to install [Keeper Secrets Manager CLI](https://docs.keeper.io/secrets-manager/secrets-manager/secrets-manager-command-line-interface)
+- `env-export`: to export a secret value in an environment variable automatically
+
+:warning: Currently the `install` command is fetching the KSM cli binary. It seems that binary is incompatible with Alpine-based systems.
+
 
 **Meta**: This repository is open for contributions! Feel free to open a pull request with your changes.
 
 ## Resources
 
-[CircleCI Orb Registry Page](https://circleci.com/orbs/registry/orb/gravitee-io/keeper) - The official registry page of this orb for all versions, executors, commands, and jobs described.
-[CircleCI Orb Docs](https://circleci.com/docs/2.0/orb-intro/#section=configuration) - Docs for using and creating CircleCI Orbs.
+- [CircleCI Orb Registry Page](https://circleci.com/orbs/registry/orb/gravitee-io/keeper) - The official registry page of this orb for all versions, executors, commands, and jobs described.
+- [CircleCI Orb Docs](https://circleci.com/docs/2.0/orb-intro/#section=configuration) - Docs for using and creating CircleCI Orbs.
 
 ### How to Contribute
 
