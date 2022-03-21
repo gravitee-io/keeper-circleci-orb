@@ -31,6 +31,7 @@ jobs:
       - keeper/install:
           version: 1.0.7
       - run:
+          name: "Assert keeper installation"
           command: |
             if [[ -f keeper.ini ]]; then
               echo "❌ keeper.ini file created in the current directory."
@@ -41,6 +42,32 @@ jobs:
               exit 1
             fi
 
+  integration-test-env-export:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - keeper/env-export:
+          secret-url: keeper://zB_JnULMlYaeCEQPE8p3HA/field/login
+          var-name: MY_USER
+      - keeper/env-export:
+          secret-url: keeper://zB_JnULMlYaeCEQPE8p3HA/field/password
+          var-name: MY_PASSWORD
+      - run:
+          name: "Assert environment variables set"
+          command: |
+            if [[ "$MY_USER" != "test" ]]; then
+              echo "❌ MY_USER env invalid"
+              echo "Expected MY_USER=test, but was MY_USER=${MY_USER}"
+              echo "Content of export command: $(cat $BASH_ENV)"
+              exit 1;
+            fi              
+            if [[ "$MY_PASSWORD" != "keeper2022" ]]; then
+              echo "❌ MY_PASSWORD env invalid"
+              echo "Expected MY_PASSWORD=keeper2022, but was MY_PASSWORD=${MY_USER}"
+              echo "Content of export command: $(cat $BASH_ENV)"
+              exit 1;
+            fi
+
 workflows:
   test-deploy:
     jobs:
@@ -48,6 +75,8 @@ workflows:
       - integration-test-install-latest:
           filters: *filters
       - integration-test-install-version:
+          filters: *filters
+      - integration-test-env-export:
           filters: *filters
       - orb-tools/pack:
           filters: *filters
@@ -59,6 +88,7 @@ workflows:
             - orb-tools/pack
             - integration-test-install-latest
             - integration-test-install-version
+            - integration-test-env-export
           context: keeper-orb-publishing
           filters:
             branches:
