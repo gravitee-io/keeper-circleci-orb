@@ -6,7 +6,6 @@ readOsReleaseFile() {
 }
 
 isAlpine() {
-
   os_release_id=$(readOsReleaseFile | grep ^ID= | cut -d "=" -f 2)
   if [ "$os_release_id" = "alpine" ];
   then
@@ -16,46 +15,59 @@ isAlpine() {
   fi
 }
 
-installKsmAlpine() {
-  echo "➡️ Install KSM on Alpine"
-
-  apk add --update --no-cache curl
-
-  if [ "${KSM_CLI_VERSION:-latest}" != "latest" ]; then
-    VERSION=${KSM_CLI_VERSION}
+isLinux() {
+  UNAME=$(uname)
+  if [ "$UNAME" = "Linux" ]; then
+    echo "true"
   else
-    # Retrieve latest version
-    echo "➡️ Retrieving latest version"
-    VERSION=$(curl --silent "https://api.github.com/repos/Keeper-Security/secrets-manager/releases/latest" | grep tag_name | awk -F\" '{ print $4 }' | awk -F- '{print $3}')
+    echo "false"
+  fi
+}
+
+getLatestVersion() {
+  curl --silent "https://api.github.com/repos/Keeper-Security/secrets-manager/releases/latest" | grep tag_name | awk -F\" '{ print $4 }' | awk -F- '{print $3}'
+}
+
+isVersionAlreadyInstalled() {
+  command -v ksm >/dev/null 2>&1 && ksm version 2>&1 | grep "CLI Version: " | cut -d " " -f 3 | grep -q "${VERSION}$"
+}
+
+buildBinaryUrl() {
+  VERSION=$1
+  is_alpine=$2
+
+  if [ "$is_alpine" = "true" ]; then
+      OS=alpine-linux
+  else
+    is_linux=$(isLinux)
+    if [ "$is_linux" = "true" ]; then
+        OS=linux
+    else
+        echo "❌ Cannot determine compatible OS type. Exiting..."
+        exit 1;
+    fi
   fi
 
-  # Exit if version is already installed
-  if command -v ksm >/dev/null 2>&1 && ksm version 2>&1 | grep "CLI Version: " | cut -d " " -f 3 | grep -q "${VERSION}$"; then
-    echo "➡️ Version ${VERSION} is already installed"
-    exit 0
-  fi
+  ARCHIVE_NAME=keeper-secrets-manager-cli-$OS-$VERSION
+  echo "https://github.com/Keeper-Security/secrets-manager/releases/download/ksm-cli-$VERSION/$ARCHIVE_NAME.tar.gz"
+}
 
+fetchBinary() {
+  SUDO=$1
+  LINK_TAR=$2
 
-  apk add --update --no-cache build-base libffi-dev python3 python3-dev py3-wheel && ln -sf python3 /usr/bin/python;
-  python3 -m ensurepip;
-  pip3 install --no-cache --upgrade pip setuptools;
-  pip3 install keeper-secrets-manager-cli=="${VERSION}"
+  $SUDO mkdir -p /usr/local/ksm/bin
+  curl -fsSL "${LINK_TAR}" | $SUDO tar -xz -C /usr/local/ksm;
 
+  # symlink in the PATH
+  $SUDO ln -sf /usr/local/ksm/ksm /usr/local/bin/ksm
 }
 
 installKsmWithBinary() {
-  echo "➡️ Install KSM with binary"
+  LINK_TAR=$1
+  echo "➡️ Install KSM from ${LINK_TAR}"
 
-  # Detect OS
-  UNAME=$(uname)
-  if [ "$UNAME" = "Linux" ]; then
-      OS=linux
-  else
-      echo "❌ Cannot determine compatible OS type. Exiting..."
-      exit;
-  fi
-
-  # Make sure we have root priviliges.
+  # Make sure we have root privileges.
   SUDO=""
   if [ "$(id -u)" -ne 0 ]; then
       if ! [ "$(command -v sudo)" ]; then
@@ -65,41 +77,34 @@ installKsmWithBinary() {
       SUDO="sudo"
   fi
 
-  echo "➡️ Creating directories"
-  $SUDO mkdir -p /usr/local/ksm/bin
+  fetchBinary "$SUDO" "$LINK_TAR"
+}
 
-  if [ "${KSM_CLI_VERSION:-latest}" != "latest" ]; then
-    VERSION=${KSM_CLI_VERSION}
-  else
-    # Retrieve latest version
-    echo "➡️ Retrieving latest version"
-    VERSION=$(curl --silent "https://api.github.com/repos/Keeper-Security/secrets-manager/releases/latest" | grep tag_name | awk -F\" '{ print $4 }' | awk -F- '{print $3}')
-  fi
-
-  # Exit if version is already installed
-  if command -v ksm >/dev/null 2>&1 && ksm version 2>&1 | grep "CLI Version: " | cut -d " " -f 3 | grep -q "${VERSION}$"; then
-    echo "➡️ Version ${VERSION} is already installed"
-    exit 0
-  fi
-
-  echo "➡️ Downloading version ${VERSION}"
-  ARCHIVE_NAME=keeper-secrets-manager-cli-$OS-$VERSION
-  LINK_TAR=https://github.com/Keeper-Security/secrets-manager/releases/download/ksm-cli-$VERSION/$ARCHIVE_NAME.tar.gz
-
-  curl -fsSL "${LINK_TAR}" | $SUDO tar -xz -C /usr/local/ksm;
-
-  # symlink in the PATH
-  $SUDO ln -sf /usr/local/ksm/ksm /usr/local/bin/ksm
+prepareEnvOnAlpine() {
+  apk add --update --no-cache curl
 }
 
 InstallKsm() {
   is_alpine=$(isAlpine)
-
   if [ "$is_alpine" = "true" ]; then
-    installKsmAlpine
-  else
-    installKsmWithBinary
+    prepareEnvOnAlpine
   fi
+
+  if [ "${KSM_CLI_VERSION:-latest}" != "latest" ]; then
+    VERSION=${KSM_CLI_VERSION}
+  else
+    VERSION=$(getLatestVersion)
+  fi
+
+  # Exit if version is already installed
+  if isVersionAlreadyInstalled; then
+    echo "➡️ Version ${VERSION} is already installed"
+    exit 0
+  fi
+
+  LINK_TAR="$(buildBinaryUrl "$VERSION" "$is_alpine")"
+
+  installKsmWithBinary "$LINK_TAR"
 }
 
 if [ "${0#*$TEST_ENV}" = "$0" ]; then
