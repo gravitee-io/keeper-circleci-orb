@@ -1,8 +1,27 @@
 #!/bin/sh
 set -e
 
-readOsReleaseFile() {
-  cat /etc/os-release 2>/dev/null
+InstallKsm() {
+  is_alpine=$(isAlpine)
+  if [ "$is_alpine" = "true" ]; then
+    prepareEnvOnAlpine
+  fi
+
+  if [ "${KSM_CLI_VERSION:-latest}" != "latest" ]; then
+    VERSION=${KSM_CLI_VERSION}
+  else
+    VERSION=$(getLatestVersion)
+  fi
+
+  # Exit if version is already installed
+  if isVersionAlreadyInstalled; then
+    echo "➡️ Version ${VERSION} is already installed"
+    exit 0
+  fi
+
+  LINK_TAR="$(buildBinaryUrl "$VERSION" "$is_alpine")"
+
+  installKsmWithBinary "$LINK_TAR"
 }
 
 isAlpine() {
@@ -13,6 +32,10 @@ isAlpine() {
   else
     echo "false"
   fi
+}
+
+readOsReleaseFile() {
+  cat /etc/os-release 2>/dev/null
 }
 
 isLinux() {
@@ -82,29 +105,6 @@ installKsmWithBinary() {
 
 prepareEnvOnAlpine() {
   apk add --update --no-cache curl
-}
-
-InstallKsm() {
-  is_alpine=$(isAlpine)
-  if [ "$is_alpine" = "true" ]; then
-    prepareEnvOnAlpine
-  fi
-
-  if [ "${KSM_CLI_VERSION:-latest}" != "latest" ]; then
-    VERSION=${KSM_CLI_VERSION}
-  else
-    VERSION=$(getLatestVersion)
-  fi
-
-  # Exit if version is already installed
-  if isVersionAlreadyInstalled; then
-    echo "➡️ Version ${VERSION} is already installed"
-    exit 0
-  fi
-
-  LINK_TAR="$(buildBinaryUrl "$VERSION" "$is_alpine")"
-
-  installKsmWithBinary "$LINK_TAR"
 }
 
 if [ "${0#*$TEST_ENV}" = "$0" ]; then
