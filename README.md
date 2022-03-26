@@ -12,10 +12,6 @@ Currently, the orb contains the following commands:
 - `install`: to install [Keeper Secrets Manager CLI](https://docs.keeper.io/secrets-manager/secrets-manager/secrets-manager-command-line-interface)
 - `env-export`: to export a secret value in an environment variable automatically
 
-:warning: On Alpine-based systems, the install command will install KSM using PIP. Therefore, the installation is way longer than the installation with binary.
-
-
-
 **Meta**: This repository is open for contributions! Feel free to open a pull request with your changes.
 
 ## Resources
