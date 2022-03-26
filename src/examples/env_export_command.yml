@@ -6,7 +6,7 @@ usage:
   version: 2.1
 
   orbs:
-    secrethub: gravitee-io/keeper@x.y.z
+    keeper: gravitee-io/keeper@x.y.z
     docker: circleci/docker@x.y.z
 
   workflows:
