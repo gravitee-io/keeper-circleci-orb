@@ -113,6 +113,27 @@ jobs:
               exit 1;
             fi
 
+  integration-test-exec:
+    docker:
+      - image: cimg/base:stable
+    environment:
+      MY_USER: keeper://zB_JnULMlYaeCEQPE8p3HA/field/login
+      MY_PASSWORD: keeper://zB_JnULMlYaeCEQPE8p3HA/field/password
+    steps:
+      - keeper/exec:
+          step-name: "Assert secret has been loaded"
+          command: |
+            if [ "$MY_USER" != "test" ]; then
+              echo "❌ MY_USER env invalid"
+              echo "Expected MY_USER=test, but was MY_USER=${MY_USER}"
+              exit 1;
+            fi              
+            if [ "$MY_PASSWORD" != "keeper2022" ]; then
+              echo "❌ MY_PASSWORD env invalid"
+              echo "Expected MY_PASSWORD=keeper2022, but was MY_PASSWORD=${MY_PASSWORD}"
+              exit 1;
+            fi
+
 workflows:
   test-deploy:
     jobs:
@@ -127,6 +148,8 @@ workflows:
           filters: *filters
       - integration-test-env-export-on-alpine:
           filters: *filters
+      - integration-test-exec:
+          filters: *filters
       - orb-tools/pack:
           filters: *filters
       - orb-tools/publish:
@@ -140,6 +163,7 @@ workflows:
             - integration-test-install-on-alpine
             - integration-test-env-export
             - integration-test-env-export-on-alpine
+            - integration-test-exec
           context: keeper-orb-publishing
           filters:
             branches:

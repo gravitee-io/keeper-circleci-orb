@@ -1,0 +1,22 @@
+description: Run a command with secret environment variables loaded from Keeper
+parameters:
+  command:
+    type: string
+    description: Command to execute with secrets
+  step-name:
+    type: string
+    default: ''
+    description: Title of the step to show in the CircleCI UI
+  flags:
+    type: string
+    default: ''
+    description: Flags to pass to the `ksm exec` command
+
+steps:
+  - install
+  - run:
+      name: << parameters.step-name >>
+      environment:
+        FLAGS: << parameters.flags >>
+        COMMAND: << parameters.command >>
+      command: <<include(scripts/exec/exec.sh)>>
