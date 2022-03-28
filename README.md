@@ -11,6 +11,7 @@
 Currently, the orb contains the following commands:
 - `install`: to install [Keeper Secrets Manager CLI](https://docs.keeper.io/secrets-manager/secrets-manager/secrets-manager-command-line-interface)
 - `env-export`: to export a secret value in an environment variable automatically
+- `exec`: to run run a command with secret environment variables loaded from Keeper
 
 **Meta**: This repository is open for contributions! Feel free to open a pull request with your changes.
 
