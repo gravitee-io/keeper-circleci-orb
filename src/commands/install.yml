@@ -26,9 +26,11 @@ steps:
       environment:
         KSM_CLI_VERSION: << parameters.version >>
       command: <<include(scripts/install/install_ksm.sh)>>
+      working_directory: /tmp
   - run:
       name: "Initialize Keeper config"
       shell: << parameters.shell >>
       environment:
         KEEPER_INI_DIR: << parameters.ini_dir >>
       command: <<include(scripts/install/init_config.sh)>>
+      working_directory: /tmp

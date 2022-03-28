@@ -18,5 +18,5 @@ steps:
       environment:
         SECRET_ENV_NAME: << parameters.var-name >>
         SECRET_URL: << parameters.secret-url >>
-
+      working_directory: /tmp
       command: <<include(scripts/env-export/env-export.sh)>>
