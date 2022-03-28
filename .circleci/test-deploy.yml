@@ -84,6 +84,13 @@ jobs:
               echo "Content of export command: $(cat $BASH_ENV)"
               exit 1;
             fi
+      - run:
+          name: "Assert no keeper.ini created"
+          command: |
+            if [[ -f keeper.ini ]]; then
+              echo "❌ keeper.ini file created in the current directory."
+              exit 1
+            fi
 
   integration-test-env-export-on-alpine:
     docker:
