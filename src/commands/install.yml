@@ -4,8 +4,8 @@ description: >
 parameters:
   version:
     type: string
-    default: "latest"
-    description: "Version of the KSM CLI"
+    default: "1.0.9"
+    description: "Version of the KSM CLI. Use latest to fetch the latest version."
   path:
     type: string
     default: /usr/local/bin

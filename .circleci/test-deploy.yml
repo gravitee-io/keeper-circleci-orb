@@ -31,7 +31,7 @@ jobs:
       - keeper/install:
           version: 1.0.7
       - run:
-          name: "Assert keeper installation"
+          name: "Assert no keeper.ini created"
           command: |
             if [[ -f keeper.ini ]]; then
               echo "❌ keeper.ini file created in the current directory."
@@ -39,6 +39,17 @@ jobs:
             fi      
             if [[ ! -f /tmp/keeper.ini ]]; then
               echo "❌ no keeper.ini file created in the /tmp directory."
+              exit 1
+            fi
+      - run:
+          name: "Assert keeper version installed"
+          working_directory: /tmp
+          command: |
+            export INSTALLED=$(ksm version | grep "CLI Version" | awk -F": " '{ print $2 }')
+
+            if [[ "$INSTALLED" != "1.0.7" ]]; then
+              echo "❌ Incorrect installed version. "
+              echo "Expected 1.0.7, but was ${INSTALLED}"
               exit 1
             fi
 
