@@ -1,7 +1,7 @@
 version: 2.1
 orbs:
   keeper: gravitee-io/keeper@dev:<<pipeline.git.revision>>
-  orb-tools: circleci/orb-tools@11.1.3
+  orb-tools: circleci/orb-tools@11.2.0
 filters: &filters
   tags:
     only: /.*/
