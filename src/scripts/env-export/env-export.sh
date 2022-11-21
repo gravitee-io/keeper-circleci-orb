@@ -2,7 +2,7 @@
 set -e
 
 generate_random_heredoc_identifier() {
-  cat /dev/urandom | env LC_ALL=C tr -dc 'a-zA-Z0-9' | fold -w 64 | head -n 1
+  < /dev/urandom env LC_ALL=C tr -dc 'a-zA-Z0-9' | fold -w 64 | head -n 1
 }
 
 get_secret_from_ksm() {
@@ -11,12 +11,12 @@ get_secret_from_ksm() {
 }
 
 EnvExport() {
-  if [ "x${SECRET_ENV_NAME}" = "x" ]; then
+  if [ "${SECRET_ENV_NAME}" = "" ]; then
     >&2 echo "SECRET_ENV_NAME env var not set"
     exit 1
   fi
 
-  if [ "x${SECRET_URL}" = "x" ]; then
+  if [ "${SECRET_URL}" = "" ]; then
     >&2 echo "SECRET_URL env var not set"
     exit 1
   fi
@@ -38,6 +38,6 @@ EnvExport() {
 
 # Will not run if sourced from another script.
 # This is done so this script may be tested.
-if [ "${0#*$TEST_ENV}" = "$0" ]; then
+if [ "${0#*"$TEST_ENV"}" = "$0" ]; then
     EnvExport
 fi
