@@ -107,6 +107,6 @@ prepareEnvOnAlpine() {
   apk add --update --no-cache curl
 }
 
-if [ "${0#*$TEST_ENV}" = "$0" ]; then
+if [ "${0#*"$TEST_ENV"}" = "$0" ]; then
     InstallKsm
 fi

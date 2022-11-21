@@ -24,6 +24,6 @@ KsmExec() {
 
 # Will not run if sourced from another script.
 # This is done so this script may be tested.
-if [ "${0#*$TEST_ENV}" = "$0" ]; then
+if [ "${0#*"$TEST_ENV"}" = "$0" ]; then
     Exec
 fi
