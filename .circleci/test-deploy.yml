@@ -75,10 +75,10 @@ jobs:
       - image: cimg/base:stable
     steps:
       - keeper/env-export:
-          secret-url: keeper://zB_JnULMlYaeCEQPE8p3HA/field/login
+          secret-url: keeper://hNWDMrAXND1mlwmBgGvIpg/field/login
           var-name: MY_USER
       - keeper/env-export:
-          secret-url: keeper://zB_JnULMlYaeCEQPE8p3HA/field/password
+          secret-url: keeper://hNWDMrAXND1mlwmBgGvIpg/field/password
           var-name: MY_PASSWORD
       - run:
           name: "Assert environment variables set"
@@ -108,10 +108,10 @@ jobs:
       - image: alpine:3.16
     steps:
       - keeper/env-export:
-          secret-url: keeper://zB_JnULMlYaeCEQPE8p3HA/field/login
+          secret-url: keeper://hNWDMrAXND1mlwmBgGvIpg/field/login
           var-name: MY_USER
       - keeper/env-export:
-          secret-url: keeper://zB_JnULMlYaeCEQPE8p3HA/field/password
+          secret-url: keeper://hNWDMrAXND1mlwmBgGvIpg/field/password
           var-name: MY_PASSWORD
       - run:
           name: "Assert environment variables set"
@@ -135,8 +135,8 @@ jobs:
     docker:
       - image: cimg/base:stable
     environment:
-      MY_USER: keeper://zB_JnULMlYaeCEQPE8p3HA/field/login
-      MY_PASSWORD: keeper://zB_JnULMlYaeCEQPE8p3HA/field/password
+      MY_USER: keeper://hNWDMrAXND1mlwmBgGvIpg/field/login
+      MY_PASSWORD: keeper://hNWDMrAXND1mlwmBgGvIpg/field/password
     steps:
       - keeper/exec:
           step-name: "Assert secret has been loaded"
