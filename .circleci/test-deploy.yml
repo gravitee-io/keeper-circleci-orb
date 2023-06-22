@@ -89,9 +89,9 @@ jobs:
               echo "Content of export command: $(cat $BASH_ENV)"
               exit 1;
             fi              
-            if [[ "$MY_PASSWORD" != "keeper2022" ]]; then
+            if [[ "$MY_PASSWORD" != ")8y9jh8{9siN^;HnL,km" ]]; then
               echo "❌ MY_PASSWORD env invalid"
-              echo "Expected MY_PASSWORD=keeper2022, but was MY_PASSWORD=${MY_USER}"
+              echo "Expected MY_PASSWORD=)8y9jh8{9siN^;HnL,km, but was MY_PASSWORD=${MY_USER}"
               echo "Content of export command: $(cat $BASH_ENV)"
               exit 1;
             fi
@@ -124,9 +124,9 @@ jobs:
               echo "Content of export command: $(cat $BASH_ENV)"
               exit 1;
             fi              
-            if [[ "$MY_PASSWORD" != "keeper2022" ]]; then
+            if [[ "$MY_PASSWORD" != ")8y9jh8{9siN^;HnL,km" ]]; then
               echo "❌ MY_PASSWORD env invalid"
-              echo "Expected MY_PASSWORD=keeper2022, but was MY_PASSWORD=${MY_USER}"
+              echo "Expected MY_PASSWORD=)8y9jh8{9siN^;HnL,km, but was MY_PASSWORD=${MY_USER}"
               echo "Content of export command: $(cat $BASH_ENV)"
               exit 1;
             fi
@@ -146,9 +146,9 @@ jobs:
               echo "Expected MY_USER=test, but was MY_USER=${MY_USER}"
               exit 1;
             fi              
-            if [ "$MY_PASSWORD" != "keeper2022" ]; then
+            if [ "$MY_PASSWORD" != ")8y9jh8{9siN^;HnL,km" ]; then
               echo "❌ MY_PASSWORD env invalid"
-              echo "Expected MY_PASSWORD=keeper2022, but was MY_PASSWORD=${MY_PASSWORD}"
+              echo "Expected MY_PASSWORD=)8y9jh8{9siN^;HnL,km, but was MY_PASSWORD=${MY_PASSWORD}"
               exit 1;
             fi
 
