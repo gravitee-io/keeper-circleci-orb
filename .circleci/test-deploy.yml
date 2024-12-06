@@ -55,7 +55,7 @@ jobs:
 
   integration-test-install-on-alpine:
     docker:
-      - image: alpine:3.16
+      - image: alpine:3.21
     steps:
       - keeper/install
       - run:
@@ -105,7 +105,7 @@ jobs:
 
   integration-test-env-export-on-alpine:
     docker:
-      - image: alpine:3.16
+      - image: alpine:3.21
     steps:
       - keeper/env-export:
           secret-url: keeper://hNWDMrAXND1mlwmBgGvIpg/field/login
