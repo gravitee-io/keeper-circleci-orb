@@ -131,6 +131,34 @@ jobs:
               exit 1;
             fi
 
+  integration-test-env-export-on-azurelinux:
+    docker:
+      - image: mcr.microsoft.com/azure-cli:latest
+    steps:
+      - keeper/env-export:
+          secret-url: keeper://hNWDMrAXND1mlwmBgGvIpg/field/login
+          var-name: MY_USER
+      - keeper/env-export:
+          secret-url: keeper://hNWDMrAXND1mlwmBgGvIpg/field/password
+          var-name: MY_PASSWORD
+      - run:
+          name: "Assert environment variables set"
+          command: |
+            . $BASH_ENV
+            
+            if [[ "$MY_USER" != "test" ]]; then
+              echo "❌ MY_USER env invalid"
+              echo "Expected MY_USER=test, but was MY_USER=${MY_USER}"
+              echo "Content of export command: $(cat $BASH_ENV)"
+              exit 1;
+            fi              
+            if [[ "$MY_PASSWORD" != ")8y9jh8{9siN^;HnL,km" ]]; then
+              echo "❌ MY_PASSWORD env invalid"
+              echo "Expected MY_PASSWORD=)8y9jh8{9siN^;HnL,km, but was MY_PASSWORD=${MY_USER}"
+              echo "Content of export command: $(cat $BASH_ENV)"
+              exit 1;
+            fi
+
   integration-test-exec:
     docker:
       - image: cimg/base:stable
@@ -166,6 +194,8 @@ workflows:
           filters: *filters
       - integration-test-env-export-on-alpine:
           filters: *filters
+      - integration-test-env-export-on-azurelinux:
+          filters: *filters
       - integration-test-exec:
           filters: *filters
       - orb-tools/pack:
@@ -181,6 +211,7 @@ workflows:
             - integration-test-install-on-alpine
             - integration-test-env-export
             - integration-test-env-export-on-alpine
+            - integration-test-env-export-on-azurelinux
             - integration-test-exec
           context: keeper-orb-publishing
           filters:

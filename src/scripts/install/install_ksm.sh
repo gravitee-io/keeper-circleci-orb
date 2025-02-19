@@ -5,6 +5,8 @@ InstallKsm() {
   is_alpine=$(isAlpine)
   if [ "$is_alpine" = "true" ]; then
     prepareEnvOnAlpine
+  elif isAzureLinux; then
+    prepareEnvOnAzureLinux
   fi
 
   if [ "${KSM_CLI_VERSION:-latest}" != "latest" ]; then
@@ -34,6 +36,10 @@ isAlpine() {
   fi
 }
 
+isAzureLinux() {
+  grep '^ID=' /etc/*release* | grep -q -i azurelinux
+}
+
 readOsReleaseFile() {
   cat /etc/os-release 2>/dev/null
 }
@@ -48,7 +54,7 @@ isLinux() {
 }
 
 getLatestVersion() {
-  curl --silent "https://api.github.com/repos/Keeper-Security/secrets-manager/releases/latest" | grep tag_name | awk -F\" '{ print $4 }' | awk -F- '{print $3}'
+  curl --silent "https://api.github.com/repos/Keeper-Security/secrets-manager/releases" | sed -n '/tag_name/{/ksm-cli/{s/^.*ksm-cli-\([0-9.]*\)",$/\1/p}}' | sort -V | tail -n 1
 }
 
 isVersionAlreadyInstalled() {
@@ -105,6 +111,10 @@ installKsmWithBinary() {
 
 prepareEnvOnAlpine() {
   apk add --update --no-cache curl
+}
+
+prepareEnvOnAzureLinux() {
+  tdnf install -y tar awk curl
 }
 
 if [ "${0#*"$TEST_ENV"}" = "$0" ]; then
