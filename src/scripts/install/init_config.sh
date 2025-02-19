@@ -11,6 +11,17 @@ InitKeeperConfig() {
     exit 1
   fi
 
+  if grep '^ID=' /etc/*release* | grep -q -i azurelinux
+  then
+    cat >> "$BASH_ENV" <<EOF
+export LC_ALL=C.UTF-8
+export LANG=C.UTF-8
+EOF
+    # export it right now to also let ksm_init_config pass
+    export LC_ALL=C.UTF-8
+    export LANG=C.UTF-8
+  fi
+
   echo "KSM_INI_DIR=${KEEPER_INI_DIR}" >> "$BASH_ENV"
 
   cd /tmp
