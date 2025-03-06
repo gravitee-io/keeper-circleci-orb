@@ -2,7 +2,7 @@
 set -e
 
 ksm_init_config(){
-  ksm version
+  "${KSM_INSTALL_DIR}/ksm" version
 }
 
 InitKeeperConfig() {

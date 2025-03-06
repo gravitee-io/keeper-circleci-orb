@@ -7,7 +7,7 @@ generate_random_heredoc_identifier() {
 
 get_secret_from_ksm() {
   url=$1
-  ksm secret notation "${url}"
+  "${KSM_INSTALL_DIR}/ksm" secret notation "${url}"
 }
 
 EnvExport() {

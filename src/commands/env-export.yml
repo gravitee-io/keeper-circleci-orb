@@ -10,12 +10,17 @@ parameters:
     description: >
       Secret notation "url". Ex: keeper://RECORD_UID/field/password
       See: https://docs.keeper.io/secrets-manager/secrets-manager/secrets-manager-command-line-interface/secret-command#notation
+  install-dir:
+    type: string
+    default: /tmp/keeper
+    description: "Path where KSM CLI is installed"
 
 steps:
   - install
   - run:
       name: Load secret in << parameters.var-name >>
       environment:
+        KSM_INSTALL_DIR: << parameters.install-dir >>
         SECRET_ENV_NAME: << parameters.var-name >>
         SECRET_URL: << parameters.secret-url >>
       working_directory: /tmp

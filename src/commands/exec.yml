@@ -11,12 +11,17 @@ parameters:
     type: string
     default: ''
     description: Flags to pass to the `ksm exec` command
+  install-dir:
+    type: string
+    default: /tmp/keeper
+    description: "Path where KSM CLI is installed"
 
 steps:
   - install
   - run:
       name: << parameters.step-name >>
       environment:
+        KSM_INSTALL_DIR: << parameters.install-dir >>
         FLAGS: << parameters.flags >>
         COMMAND: << parameters.command >>
       command: <<include(scripts/exec/exec.sh)>>

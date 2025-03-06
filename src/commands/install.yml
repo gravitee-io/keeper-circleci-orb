@@ -8,7 +8,7 @@ parameters:
     description: "Version of the KSM CLI. Use latest to fetch the latest version."
   path:
     type: string
-    default: /usr/local/bin
+    default: /tmp/keeper
     description: "Path to install KSM CLI to"
   shell:
     type: string
@@ -24,6 +24,7 @@ steps:
       name: "Ensure KSM CLI is installed"
       shell: << parameters.shell >>
       environment:
+        KSM_INSTALL_DIR: << parameters.path >>
         KSM_CLI_VERSION: << parameters.version >>
       command: <<include(scripts/install/install_ksm.sh)>>
       working_directory: /tmp
@@ -31,6 +32,7 @@ steps:
       name: "Initialize Keeper config"
       shell: << parameters.shell >>
       environment:
+        KSM_INSTALL_DIR: << parameters.path >>
         KEEPER_INI_DIR: << parameters.ini_dir >>
       command: <<include(scripts/install/init_config.sh)>>
       working_directory: /tmp

@@ -9,6 +9,13 @@ InstallKsm() {
     prepareEnvOnAzureLinux
   fi
 
+  if [ "${KSM_INSTALL_DIR}" = "" ]; then
+    INSTALL_PATH=/tmp/keeper
+  else
+    INSTALL_PATH=${KSM_INSTALL_DIR}
+  fi
+
+
   if [ "${KSM_CLI_VERSION:-latest}" != "latest" ]; then
     VERSION=${KSM_CLI_VERSION}
   else
@@ -23,7 +30,7 @@ InstallKsm() {
 
   LINK_TAR="$(buildBinaryUrl "$VERSION" "$is_alpine")"
 
-  installKsmWithBinary "$LINK_TAR"
+  installKsmWithBinary "$LINK_TAR" "$INSTALL_PATH"
 }
 
 isAlpine() {
@@ -82,31 +89,22 @@ buildBinaryUrl() {
 }
 
 fetchBinary() {
-  SUDO=$1
-  LINK_TAR=$2
+  LINK_TAR=$1
+  TARGET=$2
 
-  $SUDO mkdir -p /usr/local/ksm/bin
-  curl -fsSL "${LINK_TAR}" | $SUDO tar -xz -C /usr/local/ksm;
+  mkdir -p "${TARGET}"
+  curl -fsSL "${LINK_TAR}" | tar -xz -C "${TARGET}";
 
-  # symlink in the PATH
-  $SUDO ln -sf /usr/local/ksm/ksm /usr/local/bin/ksm
+  # Update in the PATH
+  echo "export PATH=${PATH}:${TARGET}" >> "$BASH_ENV"
 }
 
 installKsmWithBinary() {
   LINK_TAR=$1
+  INSTALL_PATH=$2
   echo "➡️ Install KSM from ${LINK_TAR}"
 
-  # Make sure we have root privileges.
-  SUDO=""
-  if [ "$(id -u)" -ne 0 ]; then
-      if ! [ "$(command -v sudo)" ]; then
-          echo "❌ Installer requires root privileges. Please run this script as root."
-          exit;
-      fi
-      SUDO="sudo"
-  fi
-
-  fetchBinary "$SUDO" "$LINK_TAR"
+  fetchBinary "$LINK_TAR" "$INSTALL_PATH"
 }
 
 prepareEnvOnAlpine() {

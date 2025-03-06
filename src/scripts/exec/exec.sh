@@ -18,7 +18,7 @@ EOF
 }
 
 KsmExec() {
-  ksm exec -- /tmp/ksm_exec.sh
+  "${KSM_INSTALL_DIR}/ksm" exec -- /tmp/ksm_exec.sh
 }
 
 

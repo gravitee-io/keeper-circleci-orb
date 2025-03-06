@@ -3,6 +3,7 @@
 setup() {
   export TEST_ENV="bats-core"
   export BASH_ENV=/tmp/bashenv
+  export INSTALL_DIR=/tmp/keeper
   export SECRET_ENV_NAME=MY_ENV
   export SECRET_URL=my_secret_url
 
