@@ -22,7 +22,7 @@ setup() {
   }
 
   fetchBinary() {
-    echo "fetch $2"
+    echo "fetch $1"
   }
 }
 
