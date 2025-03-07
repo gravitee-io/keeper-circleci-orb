@@ -1,6 +1,5 @@
 {
-  "extends": ["config:base"],
-  "commitBodyTable": true,
+  "extends": ["github>gravitee-io/renovate-config","config:base"],
   "dependencyDashboard": true,
   "circleci": {
     "fileMatch": [
