@@ -26,11 +26,13 @@ EnvExport() {
   # To support multiline secrets, we'll use the heredoc syntax to populate the environment variables.
   # As the heredoc identifier, we'll use a randomly generated 64-character string,
   # so that collisions are practically impossible.
+  # The opening identifier is quoted so the shell sourcing BASH_ENV keeps the secret verbatim:
+  # unquoted, it would expand any $, ` or \ in it, failing with a bad substitution that prints the secret.
   random_heredoc_identifier=$(generate_random_heredoc_identifier) || true
   SECRET=$(get_secret_from_ksm "${SECRET_URL}")
 
   {
-    printf "export %s=\$(cat <<%s\n" "${SECRET_ENV_NAME}" "${random_heredoc_identifier}"
+    printf "export %s=\$(cat <<'%s'\n" "${SECRET_ENV_NAME}" "${random_heredoc_identifier}"
     printf "%s\n" "${SECRET}"
     printf "%s\n)\n" "${random_heredoc_identifier}"
   } >> "${BASH_ENV}"
