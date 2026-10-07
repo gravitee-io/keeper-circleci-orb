@@ -19,6 +19,7 @@ setup() {
 teardown() {
     rm -f /tmp/bashenv
     rm -f /tmp/keeper.ini
+    rm -f /tmp/env-export-injected
 }
 
 @test "EnvExport should add export command to set the secret in an env variable" {
@@ -31,6 +32,32 @@ teardown() {
     echo "MY_ENV env invalid"
     echo "Expected MY_ENV=${SECRET_URL}, but was MY_ENV=${MY_ENV}"
     echo "Content of export command: $(cat /tmp/bashenv)"
+    exit 1;
+  fi
+}
+
+@test "EnvExport should keep shell syntax in the secret verbatim" {
+  SECRET_VALUE='<password>${env.TOKEN}</password>
+$(touch /tmp/env-export-injected) `id` $HOME \\n'
+
+  get_secret_from_ksm() {
+    printf '%s' "$SECRET_VALUE"
+  }
+
+  run EnvExport
+  [ "$status" -eq 0 ]
+
+  source /tmp/bashenv
+  if [[ "$MY_ENV" != "$SECRET_VALUE" ]]; then
+    echo
+    echo "MY_ENV env invalid"
+    echo "Expected MY_ENV=${SECRET_VALUE}, but was MY_ENV=${MY_ENV}"
+    echo "Content of export command: $(cat /tmp/bashenv)"
+    exit 1;
+  fi
+
+  if [[ -f /tmp/env-export-injected ]]; then
+    echo "Sourcing BASH_ENV ran a command substitution from the secret."
     exit 1;
   fi
 }
