@@ -38,7 +38,7 @@ teardown() {
 
 @test "EnvExport should keep shell syntax in the secret verbatim" {
   SECRET_VALUE='<password>${env.TOKEN}</password>
-$(touch /tmp/env-export-injected) `id` $HOME \\n'
+$HOME `id` \\n'
 
   get_secret_from_ksm() {
     printf '%s' "$SECRET_VALUE"
@@ -55,9 +55,23 @@ $(touch /tmp/env-export-injected) `id` $HOME \\n'
     echo "Content of export command: $(cat /tmp/bashenv)"
     exit 1;
   fi
+}
 
+@test "EnvExport should not run commands found in the secret" {
+  # No invalid ${...} here: one would abort sourcing before the commands are reached.
+  SECRET_VALUE='$(touch /tmp/env-export-injected) `touch /tmp/env-export-injected`'
+
+  get_secret_from_ksm() {
+    printf '%s' "$SECRET_VALUE"
+  }
+
+  run EnvExport
+  [ "$status" -eq 0 ]
+
+  source /tmp/bashenv
   if [[ -f /tmp/env-export-injected ]]; then
-    echo "Sourcing BASH_ENV ran a command substitution from the secret."
+    echo "Sourcing BASH_ENV ran a command found in the secret."
+    echo "Content of export command: $(cat /tmp/bashenv)"
     exit 1;
   fi
 }
